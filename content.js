@@ -1,16 +1,17 @@
 // ----------- State Variables ----------- //
+// Flags to track if the user is on the Reels page and if the app is running
 let isOnReels = false;
 let appIsRunning = false;
 let newVideoObserver;
 let instagramObserver;
 
-// Function to stop the app
+// Function to stop the app when the user navigates away from Reels
 function stopApp() {
   if (appIsRunning) {
     appIsRunning = false;
     console.log("App stopped (navigated away from /reels/).");
 
-    // Clean up logic
+    // Disconnect the observer to stop watching for new videos
     if (newVideoObserver) {
       newVideoObserver.disconnect();
       console.log("IntersectionObserver disconnected.");
@@ -18,7 +19,7 @@ function stopApp() {
   }
 }
 
-// Function to check the URL and manage app state
+// Function to check the URL and manage the app's state accordingly
 function checkURLAndManageApp() {
   const isOnInstagram = window.location.href.startsWith("https://www.instagram.com/");
   const isOnReelsPage = window.location.href.startsWith("https://www.instagram.com/reels/");
@@ -34,7 +35,7 @@ function checkURLAndManageApp() {
   }
 }
 
-// Observe URL changes using MutationObserver
+// Observe URL changes using MutationObserver to detect navigation changes
 let lastUrl = window.location.href;
 instagramObserver = new MutationObserver(() => {
   if (window.location.href !== lastUrl) {
@@ -48,7 +49,7 @@ instagramObserver.observe(document.body, {
   subtree: true,
 });
 
-// Listen for pushState, replaceState, and popstate events
+// Listen for history navigation events (pushState, replaceState, popstate)
 (function (history) {
   const pushState = history.pushState;
   const replaceState = history.replaceState;
@@ -66,11 +67,12 @@ instagramObserver.observe(document.body, {
 
 window.addEventListener("popstate", checkURLAndManageApp);
 
-// Initial check when the page loads
+// Initial URL check when the page loads
 checkURLAndManageApp();
 
 // ----------- App-Specific Logic ----------- //
 
+// Function to initialize the extension when the user is on Reels
 function initializeExtension() {
   if (!appIsRunning) {
     appIsRunning = true;
@@ -83,7 +85,7 @@ function initializeExtension() {
     let applicationIsOn = true;
     let autoReelsStart;
 
-    // ----------- Get Functions ----------- //
+    // Fetch stored setting for auto-scrolling and start if enabled
     function getStoredAutoReelsStart() {
       chrome.storage.sync.get(["autoReelsStart"], (result) => {
         autoReelsStart = result.autoReelsStart;
@@ -92,10 +94,10 @@ function initializeExtension() {
       });
     }
 
-    // ----------- Update Variables From Storage ----------- //
+    // Load the auto-scroll setting from storage
     getStoredAutoReelsStart();
 
-    // ----------- Add Listeners To Change Stored Variables ----------- //
+    // Listen for storage changes to update auto-scroll setting dynamically
     chrome.storage.onChanged.addListener((changes, areaName) => {
       if (areaName === "sync") {
         if (changes.autoReelsStart) {
@@ -105,7 +107,7 @@ function initializeExtension() {
       }
     });
 
-    // Listener for start/stop button
+    // Handle messages from background scripts or popup to toggle auto-scrolling
     chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
       if (data.event === "toggleAutoReels") {
         if (data.action === "start") {
@@ -120,7 +122,7 @@ function initializeExtension() {
       }
     });
 
-    // Start auto-scrolling
+    // Start auto-scrolling through reels
     function startAutoScrolling() {
       console.log("Start auto-scrolling");
       if (!applicationIsOn) {
@@ -143,7 +145,7 @@ function initializeExtension() {
       }
     }
 
-    // Start the loop for auto-scrolling
+    // Loop to check when to scroll to the next video
     function beginAutoScrollLoop() {
       setInterval(() => {
         if (applicationIsOn) {
@@ -153,89 +155,55 @@ function initializeExtension() {
             currentVideo.addEventListener("ended", onVideoEnd);
           }
         }
-      }, 100); // Repeat every 100ms
+      }, 100);
     }
 
-    // Handles the end of a video
+    // Event listener for when a video ends, triggering the next one
     function onVideoEnd() {
       const currentVideo = getCurrentVideo();
       if (!currentVideo) return;
-
       const nextVideoInfo = getNextVideo(currentVideo);
       const nextVideo = nextVideoInfo[0];
-
       if (nextVideo && autoReelsStart) {
         scrollToNextVideo(nextVideo);
       }
     }
 
-    // Find the next video based on the current one
+    // Find the next video after the current one
     function getNextVideo(currentVideo) {
       const videos = Array.from(document.querySelectorAll(VIDEOS_LIST_SELECTOR));
       const index = videos.findIndex((vid) => vid === currentVideo);
-      return [videos[index + 1] || null]; // Return the next video or null
+      return [videos[index + 1] || null];
     }
 
-    // Scroll to the next video
+    // Scroll to the next video in the list
     function scrollToNextVideo(nextVideo) {
       if (nextVideo) {
-        nextVideo.scrollIntoView({
-          behavior: "smooth",
-          inline: "center",
-          block: "center",
-        });
+        nextVideo.scrollIntoView({ behavior: "smooth", inline: "center", block: "center" });
         console.log("Scrolling to the next video.");
       }
     }
 
-    // Get the currently visible video on the screen
+    // Get the currently visible video
     function getCurrentVideo() {
-      return Array.from(document.querySelectorAll(VIDEOS_LIST_SELECTOR)).find(
-        (video) => {
-          const rect = video.getBoundingClientRect();
-          return (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= window.innerHeight &&
-            rect.right <= window.innerWidth
-          );
-        }
-      );
+      return Array.from(document.querySelectorAll(VIDEOS_LIST_SELECTOR)).find((video) => {
+        const rect = video.getBoundingClientRect();
+        return rect.top >= 0 && rect.left >= 0 && rect.bottom <= window.innerHeight && rect.right <= window.innerWidth;
+      });
     }
 
-    newVideoObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!appIsRunning) {
-            console.log("App is no longer running, skipping video processing.");
-            return;
-          }
+    // Set up observer to track new videos being loaded
+    newVideoObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!appIsRunning) return;
+        if (entry.isIntersecting) console.log("Video is in view:", entry.target);
+      });
+    }, { threshold: 0.5 });
 
-          if (entry.isIntersecting) {
-            console.log("Video is in view:", entry.target);
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    // Function to start observing a video
-    function observeVideo(video) {
-      newVideoObserver.observe(video);
-    }
-
-    // Function to observe all videos on the page
+    // Observe all videos on the page
     function observeAllVideos() {
-      const videos = document.querySelectorAll("main video");
-      videos.forEach((video) => observeVideo(video));
+      document.querySelectorAll("main video").forEach((video) => newVideoObserver.observe(video));
     }
-
-    // Start observing all videos initially
     observeAllVideos();
-
-    // Check for new videos to observe every 2 seconds
-    setInterval(() => {
-      document.querySelectorAll("main video").forEach((video) => observeVideo(video));
-    }, 500);
   }
 }
