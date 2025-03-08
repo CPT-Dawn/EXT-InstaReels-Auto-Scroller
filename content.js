@@ -12,7 +12,9 @@ function toggleAutoScrolling(state) {
 
 // Function to check the URL and start/stop the app accordingly
 function checkURLAndManageApp() {
-  const isOnReelsPage = window.location.href.startsWith("https://www.instagram.com/reels/");
+  const isOnReelsPage = window.location.href.startsWith(
+    "https://www.instagram.com/reels/"
+  );
   if (isOnReelsPage && !isOnReels) {
     isOnReels = true;
     chrome.storage.sync.get("autoReelsStart", (result) => {
@@ -51,7 +53,7 @@ function onVideoEnd() {
 
 // Utility functions
 function getCurrentVideo() {
-  return [...document.querySelectorAll("main video")].find(video => {
+  return [...document.querySelectorAll("main video")].find((video) => {
     const rect = video.getBoundingClientRect();
     return rect.top >= 0 && rect.bottom <= window.innerHeight;
   });
@@ -59,7 +61,9 @@ function getCurrentVideo() {
 
 function getNextVideo() {
   const videos = document.querySelectorAll("main video");
-  const currentIndex = [...videos].findIndex(video => video === getCurrentVideo());
+  const currentIndex = [...videos].findIndex(
+    (video) => video === getCurrentVideo()
+  );
   return videos[currentIndex + 1] || null;
 }
 
@@ -68,7 +72,10 @@ function scrollToNextVideo(video) {
 }
 
 // MutationObserver to track URL changes
-new MutationObserver(checkURLAndManageApp).observe(document.body, { childList: true, subtree: true });
+new MutationObserver(checkURLAndManageApp).observe(document.body, {
+  childList: true,
+  subtree: true,
+});
 window.addEventListener("popstate", checkURLAndManageApp);
 checkURLAndManageApp();
 
