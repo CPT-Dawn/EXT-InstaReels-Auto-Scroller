@@ -1,14 +1,5 @@
-const autoUnmute = document.getElementById("autoUnmuteToggle")
-const autoCommentsToggle = document.getElementById("autoCommentsToggle")
 const autoReelsToggle = document.getElementById("autoReelsToggle")
 const startButton = document.getElementById("startStopButton")
-
-chrome.storage.sync.get("autoUnmute", (result) => {
-    print(result)
-    autoMuteValue = result.autoUnmute;
-    console.log("autoMute original value on startup: ", autoMuteValue);
-    autoUnmute.checked = autoMuteValue
-});
 
 chrome.storage.sync.get("autoReelsStart", (result) => {
     print(result)
@@ -17,23 +8,6 @@ chrome.storage.sync.get("autoReelsStart", (result) => {
     autoReelsToggle.checked = autoReelsStartValue
     document.getElementById("startStopButton").textContent = autoReelsStartValue ? "Stop" : "Start";
 });
-
-chrome.storage.sync.get("autoComments", (result) => {
-    print(result)
-    autoCommentsValue = result.autoComments;
-    console.log("autoComments original value on startup: ", autoCommentsValue);
-    autoCommentsToggle.checked = autoCommentsValue
-});
-
-autoUnmute.onclick = () => {
-    const autoUnmuteValue = autoUnmute.checked
-    chrome.runtime.sendMessage({ event: "autoMute", autoUnmuteValue})
-}
-
-autoCommentsToggle.onclick = () => {
-    const autoCommentsValue = autoCommentsToggle.checked
-    chrome.runtime.sendMessage({ event: "autoComments", autoCommentsValue})
-}
 
 autoReelsToggle.onclick = () => {
     const autoReelsValue = autoReelsToggle.checked
