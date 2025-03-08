@@ -24,7 +24,7 @@
   ],
   "action": {
     "default_icon": "imgs/icon128.png",
-    "default_popup": "popup/popup.html"
+    "default_popup": "popup.html"
   },
   "host_permissions": [
     "http://*/*",
