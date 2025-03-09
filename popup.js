@@ -1,31 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const autoReelsToggle = document.getElementById("autoReelsToggle");
-    const injectToggleButton = document.getElementById("injectToggleButton");
+    const toggle = document.getElementById("autoReelsToggle");
+    const injectToggle = document.getElementById("injectReelsButtonToggle");
 
-    chrome.storage.sync.get(["autoReelsStart", "showToggleButton"], (data) => {
-        autoReelsToggle.checked = data.autoReelsStart || false;
-        injectToggleButton.checked = data.showToggleButton || false;
+    // Load stored values
+    chrome.storage.sync.get(["autoReelsStart", "injectReelsButton"], (data) => {
+        toggle.checked = data.autoReelsStart || false;
+        injectToggle.checked = data.injectReelsButton || false;
     });
 
-    function refreshPage() {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs[0]?.id) chrome.tabs.reload(tabs[0].id);
-        });
-    }
-
-    autoReelsToggle.addEventListener("change", () => {
-        const newState = autoReelsToggle.checked;
-        chrome.storage.sync.set({ autoReelsStart: newState }, () => {
-            chrome.runtime.sendMessage({ event: "toggleAutoReels", state: newState });
-            refreshPage();
+    // ✅ Auto Scroll Toggle
+    toggle.addEventListener("change", () => {
+        chrome.storage.sync.set({ autoReelsStart: toggle.checked }, () => {
+            chrome.runtime.sendMessage({ event: "toggleAutoReels" });
         });
     });
 
-    injectToggleButton.addEventListener("change", () => {
-        const newState = injectToggleButton.checked;
-        chrome.storage.sync.set({ showToggleButton: newState }, () => {
-            chrome.runtime.sendMessage({ event: "toggleButtonInjection", state: newState });
-            refreshPage();
+    // ✅ Inject Button Toggle (Refresh Fix)
+    injectToggle.addEventListener("change", () => {
+        chrome.storage.sync.set({ injectReelsButton: injectToggle.checked }, () => {
+            chrome.runtime.sendMessage({ event: "toggleInjectButton" });
+            setTimeout(() => {
+                chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                    if (tabs[0]?.id) chrome.tabs.reload(tabs[0].id);
+                });
+            }, 200); // ✅ Ensures refresh applies properly
         });
     });
 });

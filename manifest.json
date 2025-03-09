@@ -6,8 +6,7 @@
   "icons": {
     "128": "imgs/icon128.png"
   },
-  "permissions": ["storage", "activeTab", "scripting"],
-  "host_permissions": ["https://www.instagram.com/*"],
+  "permissions": ["storage", "activeTab", "scripting", "tabs"],
   "content_scripts": [
     {
       "matches": ["https://www.instagram.com/reels/*"],
