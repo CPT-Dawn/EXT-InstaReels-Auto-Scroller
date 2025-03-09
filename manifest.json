@@ -4,7 +4,12 @@
   "version": "1.0",
   "description": "Auto-scrolls Instagram Reels and optionally injects a toggle button.",
   "icons": {
-    "128": "imgs/icon128.png"
+    "128": "imgs/icon128.png",
+    "48": "imgs/icon48.png",
+    "38": "imgs/icon38.png",
+    "32": "imgs/icon32.png",
+    "19": "imgs/icon19.png",
+    "16": "imgs/icon16.png"
   },
   "permissions": ["storage", "activeTab", "scripting", "tabs"],
   "content_scripts": [
