@@ -1,7 +1,20 @@
 let appIsRunning = false;
+let currentURL = window.location.href;
 
-// Function to inject the toggle button in a visible location
+// Function to check if we are on the Reels page
+function isOnReelsPage() {
+    return window.location.href.startsWith("https://www.instagram.com/reels/");
+}
+
+// Function to inject the toggle button
 function injectToggleButton() {
+    // Remove button if not on Reels page
+    if (!isOnReelsPage()) {
+        const existingButton = document.getElementById("instaAutoScrollToggle");
+        if (existingButton) existingButton.remove();
+        return;
+    }
+
     // Prevent duplicate buttons
     if (document.getElementById("instaAutoScrollToggle")) return;
 
@@ -24,7 +37,7 @@ function injectToggleButton() {
         z-index: 99999;
     `;
 
-    // Load saved state and set button opacity
+    // Load saved toggle state and update button opacity
     chrome.storage.sync.get("autoReelsStart", (data) => {
         toggleButton.style.opacity = data.autoReelsStart ? "1" : "0.5";
     });
@@ -52,7 +65,7 @@ function injectToggleButton() {
 // Function to start auto-scrolling
 function autoScrollReels() {
     setInterval(() => {
-        if (!appIsRunning) return;
+        if (!appIsRunning || !isOnReelsPage()) return;
         const currentVideo = document.querySelector("main video");
         if (currentVideo) {
             currentVideo.removeAttribute("loop");
@@ -71,9 +84,14 @@ chrome.runtime.onMessage.addListener((message) => {
     }
 });
 
-// Observe page changes and inject the button when needed
-const observer = new MutationObserver(injectToggleButton);
+// Observe page changes and manage button visibility
+const observer = new MutationObserver(() => {
+    if (window.location.href !== currentURL) {
+        currentURL = window.location.href;
+        injectToggleButton();
+    }
+});
 observer.observe(document.body, { childList: true, subtree: true });
 
-// Initial button injection
+// Initial check to inject or remove the button
 injectToggleButton();
