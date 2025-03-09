@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const toggle = document.getElementById("autoReelsToggle");
-    const toggleBackground = document.getElementById("toggleBackground");
-    const toggleCircle = document.getElementById("toggleCircle");
+    const toggleBackground = document.querySelector(".toggle-background");
+    const toggleCircle = document.querySelector(".toggle-circle");
 
     // Load the stored state
     chrome.storage.sync.get("autoReelsStart", (data) => {
@@ -32,13 +32,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Function to update the toggle UI
     function updateToggleUI(isEnabled) {
         if (isEnabled) {
-            toggleBackground.classList.remove("bg-gray-500");
-            toggleBackground.classList.add("bg-pink-500");
-            toggleCircle.classList.add("translate-x-6");
+            toggleBackground.style.background = "#ff4081";
+            toggleCircle.style.transform = "translateX(26px)";
         } else {
-            toggleBackground.classList.remove("bg-pink-500");
-            toggleBackground.classList.add("bg-gray-500");
-            toggleCircle.classList.remove("translate-x-6");
+            toggleBackground.style.background = "#666";
+            toggleCircle.style.transform = "translateX(0)";
         }
     }
 });

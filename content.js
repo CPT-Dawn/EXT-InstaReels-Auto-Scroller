@@ -85,3 +85,5 @@ chrome.runtime.onMessage.addListener((message) => {
     toggleAutoScrolling(message.state);
   }
 });
+
+
