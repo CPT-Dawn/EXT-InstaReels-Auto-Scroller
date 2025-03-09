@@ -2,19 +2,11 @@
   "manifest_version": 3,
   "name": "Instagram Auto-Scroller",
   "version": "1.0",
-  "description": "Auto-scrolling and comment opening for Instagram Reels.",
+  "description": "Auto-scrolls Instagram Reels automatically.",
   "icons": {
-      "16": "imgs/icon16.png",
-      "19": "imgs/icon19.png",
-      "32": "imgs/icon32.png",
-      "38": "imgs/icon38.png",
-      "48": "imgs/icon48.png",
-      "128": "imgs/icon128.png"
-    },
-  "permissions": [
-    "storage", 
-    "activeTab"
-    ],
+    "128": "imgs/icon128.png"
+  },
+  "permissions": ["storage", "activeTab"],
   "content_scripts": [
     {
       "matches": ["https://www.instagram.com/*"],
@@ -23,11 +15,7 @@
     }
   ],
   "action": {
-    "default_icon": "imgs/icon128.png",
-    "default_popup": "popup.html"
-  },
-  "host_permissions": [
-    "http://*/*",
-    "https://*/*"
-  ]
+    "default_popup": "popup.html",
+    "default_icon": "imgs/icon128.png"
+  }
 }

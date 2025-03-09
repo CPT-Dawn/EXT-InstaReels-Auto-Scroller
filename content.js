@@ -1,89 +1,79 @@
-let isOnReels = false;
 let appIsRunning = false;
-let newVideoObserver;
 
-// Function to toggle auto-scrolling
-function toggleAutoScrolling(state) {
-  appIsRunning = state;
-  chrome.storage.sync.set({ autoReelsStart: state });
-  console.log(`Auto-scrolling ${state ? "started" : "stopped"}.`);
-  state ? startAutoScrolling() : stopAutoScrolling();
-}
+// Function to inject the toggle button in a visible location
+function injectToggleButton() {
+    // Prevent duplicate buttons
+    if (document.getElementById("instaAutoScrollToggle")) return;
 
-// Function to check the URL and start/stop the app accordingly
-function checkURLAndManageApp() {
-  const isOnReelsPage = window.location.href.startsWith(
-    "https://www.instagram.com/reels/"
-  );
-  if (isOnReelsPage && !isOnReels) {
-    isOnReels = true;
-    chrome.storage.sync.get("autoReelsStart", (result) => {
-      if (result.autoReelsStart) toggleAutoScrolling(true);
+    // Create the toggle button
+    const toggleButton = document.createElement("button");
+    toggleButton.id = "instaAutoScrollToggle";
+    toggleButton.innerText = "🔄 Auto-Scroll";
+    toggleButton.style.cssText = `
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        background: rgba(255, 64, 129, 0.9);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 99999;
+    `;
+
+    // Load saved state and set button opacity
+    chrome.storage.sync.get("autoReelsStart", (data) => {
+        toggleButton.style.opacity = data.autoReelsStart ? "1" : "0.5";
     });
-  } else if (!isOnReelsPage && isOnReels) {
-    isOnReels = false;
-    toggleAutoScrolling(false);
-  }
+
+    // Toggle button click event
+    toggleButton.addEventListener("click", () => {
+        chrome.storage.sync.get("autoReelsStart", (data) => {
+            const newState = !data.autoReelsStart;
+            chrome.storage.sync.set({ autoReelsStart: newState });
+
+            toggleButton.style.opacity = newState ? "1" : "0.5";
+
+            // Send message to background script
+            chrome.runtime.sendMessage({ event: "toggleAutoReels", state: newState });
+
+            // Refresh page
+            location.reload();
+        });
+    });
+
+    // Append button to the page
+    document.body.appendChild(toggleButton);
 }
 
 // Function to start auto-scrolling
-function startAutoScrolling() {
-  console.log("Auto-scrolling enabled");
-  setInterval(() => {
-    if (!appIsRunning) return;
-    const currentVideo = getCurrentVideo();
-    if (currentVideo) {
-      currentVideo.removeAttribute("loop");
-      currentVideo.addEventListener("ended", onVideoEnd);
-    }
-  }, 100);
+function autoScrollReels() {
+    setInterval(() => {
+        if (!appIsRunning) return;
+        const currentVideo = document.querySelector("main video");
+        if (currentVideo) {
+            currentVideo.removeAttribute("loop");
+            currentVideo.addEventListener("ended", () => {
+                window.scrollBy(0, window.innerHeight);
+            });
+        }
+    }, 100);
 }
 
-// Function to stop auto-scrolling
-function stopAutoScrolling() {
-  console.log("Auto-scrolling disabled");
-}
-
-// Function to handle video end event
-function onVideoEnd() {
-  if (!appIsRunning) return;
-  const nextVideo = getNextVideo();
-  if (nextVideo) scrollToNextVideo(nextVideo);
-}
-
-// Utility functions
-function getCurrentVideo() {
-  return [...document.querySelectorAll("main video")].find((video) => {
-    const rect = video.getBoundingClientRect();
-    return rect.top >= 0 && rect.bottom <= window.innerHeight;
-  });
-}
-
-function getNextVideo() {
-  const videos = document.querySelectorAll("main video");
-  const currentIndex = [...videos].findIndex(
-    (video) => video === getCurrentVideo()
-  );
-  return videos[currentIndex + 1] || null;
-}
-
-function scrollToNextVideo(video) {
-  video.scrollIntoView({ behavior: "smooth", block: "center" });
-}
-
-// MutationObserver to track URL changes
-new MutationObserver(checkURLAndManageApp).observe(document.body, {
-  childList: true,
-  subtree: true,
-});
-window.addEventListener("popstate", checkURLAndManageApp);
-checkURLAndManageApp();
-
-// Listener for toggle button in popup
+// Listen for toggle messages from popup
 chrome.runtime.onMessage.addListener((message) => {
-  if (message.event === "toggleAutoReels") {
-    toggleAutoScrolling(message.state);
-  }
+    if (message.event === "toggleAutoReels") {
+        appIsRunning = message.state;
+        if (appIsRunning) autoScrollReels();
+    }
 });
 
+// Observe page changes and inject the button when needed
+const observer = new MutationObserver(injectToggleButton);
+observer.observe(document.body, { childList: true, subtree: true });
 
+// Initial button injection
+injectToggleButton();
