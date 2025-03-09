@@ -1,29 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InstaReels Auto-Scroller</title>
-    <script src="popup.js" defer></script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="popup.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto-Scroller</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="popup.js" defer></script>
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center">
+<body>
+  <div class="extension-container">
+    <h1 class="title">InstaReels Auto-Scroller</h1>
 
-    <div class="popup-container">
-        <h1 class="title">InstaReels Auto-Scroller</h1>
+    <label class="toggle-container">
+      <p>Auto-Scroll</p>
+      <input type="checkbox" id="autoReelsToggle">
+      <span class="toggle-slider"></span>
+    </label>
 
-        <div class="toggle-container">
-            <span>Auto Scroll</span>
-            <label class="toggle-wrapper">
-                <input type="checkbox" id="autoReelsToggle" class="sr-only">
-                <div class="toggle-background"></div>
-                <div class="toggle-circle"></div>
-            </label>
-        </div>
-
-        <p class="description">Toggle to enable/disable auto-scrolling.</p>
-    </div>
-
+    <label class="toggle-container">
+      <p>Show toggle in Reels</p>
+      <input type="checkbox" id="injectToggleButton">
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
 </body>
 </html>

@@ -1,24 +1,31 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const toggle = document.getElementById("autoReelsToggle");
+    const autoReelsToggle = document.getElementById("autoReelsToggle");
+    const injectToggleButton = document.getElementById("injectToggleButton");
 
-    // Load saved state
-    chrome.storage.sync.get("autoReelsStart", (data) => {
-        toggle.checked = data.autoReelsStart || false;
+    chrome.storage.sync.get(["autoReelsStart", "showToggleButton"], (data) => {
+        autoReelsToggle.checked = data.autoReelsStart || false;
+        injectToggleButton.checked = data.showToggleButton || false;
     });
 
-    // Toggle state on change
-    toggle.addEventListener("change", () => {
-        const newState = toggle.checked;
-        chrome.storage.sync.set({ autoReelsStart: newState });
-
-        // Send message to content script
-        chrome.runtime.sendMessage({ event: "toggleAutoReels", state: newState });
-
-        // Refresh Instagram page
+    function refreshPage() {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs.length > 0) {
-                chrome.tabs.reload(tabs[0].id);
-            }
+            if (tabs[0]?.id) chrome.tabs.reload(tabs[0].id);
+        });
+    }
+
+    autoReelsToggle.addEventListener("change", () => {
+        const newState = autoReelsToggle.checked;
+        chrome.storage.sync.set({ autoReelsStart: newState }, () => {
+            chrome.runtime.sendMessage({ event: "toggleAutoReels", state: newState });
+            refreshPage();
+        });
+    });
+
+    injectToggleButton.addEventListener("change", () => {
+        const newState = injectToggleButton.checked;
+        chrome.storage.sync.set({ showToggleButton: newState }, () => {
+            chrome.runtime.sendMessage({ event: "toggleButtonInjection", state: newState });
+            refreshPage();
         });
     });
 });

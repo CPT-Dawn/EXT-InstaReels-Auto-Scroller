@@ -1,97 +1,77 @@
 let appIsRunning = false;
-let currentURL = window.location.href;
 
-// Function to check if we are on the Reels page
-function isOnReelsPage() {
-    return window.location.href.startsWith("https://www.instagram.com/reels/");
-}
+chrome.storage.sync.get("autoReelsStart", (data) => {
+    if (data.autoReelsStart) startAutoScrolling();
+});
 
-// Function to inject the toggle button
-function injectToggleButton() {
-    // Remove button if not on Reels page
-    if (!isOnReelsPage()) {
-        const existingButton = document.getElementById("instaAutoScrollToggle");
-        if (existingButton) existingButton.remove();
-        return;
+chrome.runtime.onMessage.addListener((message) => {
+    if (message.event === "toggleAutoReels") {
+        message.state ? startAutoScrolling() : stopAutoScrolling();
+    } else if (message.event === "toggleButtonInjection") {
+        message.state ? injectButton() : removeButton();
     }
+});
 
-    // Prevent duplicate buttons
-    if (document.getElementById("instaAutoScrollToggle")) return;
+function startAutoScrolling() {
+    appIsRunning = true;
+    console.log("Auto-scrolling enabled");
 
-    // Create the toggle button
-    const toggleButton = document.createElement("button");
-    toggleButton.id = "instaAutoScrollToggle";
-    toggleButton.innerText = "🔄 Auto-Scroll";
-    toggleButton.style.cssText = `
-        position: fixed;
-        top: 15px;
-        right: 15px;
-        background: rgba(255, 64, 129, 0.9);
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        z-index: 99999;
-    `;
-
-    // Load saved toggle state and update button opacity
-    chrome.storage.sync.get("autoReelsStart", (data) => {
-        toggleButton.style.opacity = data.autoReelsStart ? "1" : "0.5";
-    });
-
-    // Toggle button click event
-    toggleButton.addEventListener("click", () => {
-        chrome.storage.sync.get("autoReelsStart", (data) => {
-            const newState = !data.autoReelsStart;
-            chrome.storage.sync.set({ autoReelsStart: newState });
-
-            toggleButton.style.opacity = newState ? "1" : "0.5";
-
-            // Send message to background script
-            chrome.runtime.sendMessage({ event: "toggleAutoReels", state: newState });
-
-            // Refresh page
-            location.reload();
-        });
-    });
-
-    // Append button to the page
-    document.body.appendChild(toggleButton);
-}
-
-// Function to start auto-scrolling
-function autoScrollReels() {
     setInterval(() => {
-        if (!appIsRunning || !isOnReelsPage()) return;
-        const currentVideo = document.querySelector("main video");
+        if (!appIsRunning) return;
+        const currentVideo = getCurrentVideo();
         if (currentVideo) {
             currentVideo.removeAttribute("loop");
-            currentVideo.addEventListener("ended", () => {
-                window.scrollBy(0, window.innerHeight);
-            });
+            currentVideo.addEventListener("ended", onVideoEnd);
         }
     }, 100);
 }
 
-// Listen for toggle messages from popup
-chrome.runtime.onMessage.addListener((message) => {
-    if (message.event === "toggleAutoReels") {
-        appIsRunning = message.state;
-        if (appIsRunning) autoScrollReels();
-    }
-});
+function stopAutoScrolling() {
+    appIsRunning = false;
+    console.log("Auto-scrolling disabled");
+}
 
-// Observe page changes and manage button visibility
-const observer = new MutationObserver(() => {
-    if (window.location.href !== currentURL) {
-        currentURL = window.location.href;
-        injectToggleButton();
-    }
-});
-observer.observe(document.body, { childList: true, subtree: true });
+function onVideoEnd() {
+    if (!appIsRunning) return;
+    const nextVideo = getNextVideo();
+    if (nextVideo) nextVideo.scrollIntoView({ behavior: "smooth", block: "center" });
+}
 
-// Initial check to inject or remove the button
-injectToggleButton();
+function getCurrentVideo() {
+    return [...document.querySelectorAll("main video")].find(video => {
+        const rect = video.getBoundingClientRect();
+        return rect.top >= 0 && rect.bottom <= window.innerHeight;
+    });
+}
+
+function getNextVideo() {
+    const videos = document.querySelectorAll("main video");
+    return videos[[...videos].findIndex(v => v === getCurrentVideo()) + 1] || null;
+}
+
+// Injects a toggle button in Reels page
+function injectButton() {
+    if (document.getElementById("reels-toggle-button")) return;
+
+    const btn = document.createElement("button");
+    btn.innerText = "Toggle Auto-Scroll";
+    btn.id = "reels-toggle-button";
+    btn.style.position = "fixed";
+    btn.style.bottom = "100px";
+    btn.style.right = "20px";
+    btn.style.padding = "10px";
+    btn.style.background = "#4CAF50";
+    btn.style.color = "white";
+    btn.style.border = "none";
+    btn.style.borderRadius = "5px";
+    btn.style.cursor = "pointer";
+
+    btn.addEventListener("click", () => chrome.runtime.sendMessage({ event: "toggleAutoReels", state: !appIsRunning }));
+
+    document.body.appendChild(btn);
+}
+
+function removeButton() {
+    const btn = document.getElementById("reels-toggle-button");
+    if (btn) btn.remove();
+}
