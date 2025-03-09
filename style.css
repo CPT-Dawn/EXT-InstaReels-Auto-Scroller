@@ -5,10 +5,7 @@
 }
 
 body {
-  @font-face {
-    font-family: 'Instagram Sans Medium';
-    src: url('fonts/using.ttf') format('truetype');
-  }
+  font-family: system-ui, sans-serif;
   text-align: center;
   position: relative;
   padding: 8px;
@@ -47,7 +44,7 @@ body::before{
 }
 
 .toggle-container {
-  font-family: Lato;
+  font-family: system-ui, sans-serif;;
   display: flex;
   align-items: center;
   justify-content: space-between;
