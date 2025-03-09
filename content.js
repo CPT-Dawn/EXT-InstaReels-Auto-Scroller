@@ -11,14 +11,19 @@ function toggleAutoScrolling(state) {
 
 // Function to check if we are on the Reels page and apply changes
 function checkURLAndManageApp() {
-  const isOnReelsPage = window.location.href.startsWith("https://www.instagram.com/reels/");
+  const isOnReelsPage = window.location.href.startsWith(
+    "https://www.instagram.com/reels/"
+  );
 
   if (isOnReelsPage && !isOnReels) {
     isOnReels = true;
-    chrome.storage.sync.get(["autoReelsStart", "injectReelsButton"], (result) => {
-      if (result.autoReelsStart) toggleAutoScrolling(true);
-      if (result.injectReelsButton) injectButton();
-    });
+    chrome.storage.sync.get(
+      ["autoReelsStart", "injectReelsButton"],
+      (result) => {
+        if (result.autoReelsStart) toggleAutoScrolling(true);
+        if (result.injectReelsButton) injectButton();
+      }
+    );
   } else if (!isOnReelsPage && isOnReels) {
     isOnReels = false;
     toggleAutoScrolling(false);
@@ -67,7 +72,9 @@ function getCurrentVideo() {
 
 function getNextVideo() {
   const videos = document.querySelectorAll("main video");
-  const currentIndex = [...videos].findIndex((video) => video === getCurrentVideo());
+  const currentIndex = [...videos].findIndex(
+    (video) => video === getCurrentVideo()
+  );
   return videos[currentIndex + 1] || null;
 }
 
@@ -82,12 +89,12 @@ function injectButton() {
   const button = document.createElement("button");
   button.innerText = "Auto Scroll";
   button.id = "myInjectedButton";
-  button.style.position = "fixed";  
-  button.style.right = "20px";  
-  button.style.bottom = "80px";  
-  button.style.zIndex = "1000";  
+  button.style.position = "fixed";
+  button.style.right = "20px";
+  button.style.bottom = "80px";
+  button.style.zIndex = "1000";
   button.style.padding = "10px";
-  button.style.backgroundColor = "#0095F6";  
+  button.style.backgroundColor = "#0095F6";
   button.style.color = "white";
   button.style.border = "none";
   button.style.borderRadius = "5px";
@@ -101,7 +108,10 @@ function injectButton() {
     chrome.storage.sync.get("autoReelsStart", (data) => {
       const newState = !data.autoReelsStart; // Toggle state
       chrome.storage.sync.set({ autoReelsStart: newState }, () => {
-        chrome.runtime.sendMessage({ event: "toggleAutoReels", state: newState });
+        chrome.runtime.sendMessage({
+          event: "toggleAutoReels",
+          state: newState,
+        });
         location.reload(); // Refresh to apply changes
       });
     });
