@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     chrome.storage.sync.get(["autoReelsStart", "injectReelsButton"], (data) => {
         toggle.checked = data.autoReelsStart || false;
         injectToggle.checked = data.injectReelsButton || false;
+        console.log("testing")
     });
 
     // ✅ Auto Scroll Toggle
