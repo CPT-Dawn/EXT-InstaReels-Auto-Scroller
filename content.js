@@ -3,13 +3,13 @@ let appIsRunning = false;
 
 // ✅ Function to start or stop auto-scrolling
 function toggleAutoScrolling(state, shouldRefresh = true) {
-  appIsRunning = state;
+  appIsRunning = state; // Set the application state to the provided state
   chrome.storage.sync.set({ autoReelsStart: state }, () => {
-    updateToggleState(state);
-    if (shouldRefresh) location.reload();
+    updateToggleState(state); // Update the visual state of the toggle
+    if (shouldRefresh) location.reload(); // Reload the page if shouldRefresh is true
   });
 
-  state ? startAutoScrolling() : stopAutoScrolling();
+  state ? startAutoScrolling() : stopAutoScrolling(); // Start or stop auto-scrolling based on the state
 }
 
 // ✅ Check if we are on the Reels page and apply changes
@@ -17,15 +17,15 @@ function checkURLAndManageApp() {
   const isOnReelsPage = window.location.href.startsWith("https://www.instagram.com/reels/");
 
   if (isOnReelsPage && !isOnReels) {
-    isOnReels = true;
+    isOnReels = true; // Update the state to indicate we are on the Reels page
     chrome.storage.sync.get(["autoReelsStart", "injectReelsButton"], (result) => {
-      if (result.autoReelsStart) toggleAutoScrolling(true, false);
-      if (result.injectReelsButton) injectToggle(result.autoReelsStart);
+      if (result.autoReelsStart) toggleAutoScrolling(true, false); // Start auto-scrolling if enabled
+      if (result.injectReelsButton) injectToggle(result.autoReelsStart); // Inject toggle button if enabled
     });
   } else if (!isOnReelsPage && isOnReels) {
-    isOnReels = false;
-    toggleAutoScrolling(false, false);
-    removeToggle();
+    isOnReels = false; // Update the state to indicate we are leaving the Reels page
+    toggleAutoScrolling(false, false); // Stop auto-scrolling
+    removeToggle(); // Remove the toggle button
   }
 }
 
@@ -88,14 +88,14 @@ function injectToggle(isEnabled) {
 
   toggleWrapper.addEventListener("click", () => {
     chrome.storage.sync.get("autoReelsStart", (data) => {
-      const newState = !data.autoReelsStart;
+      const newState = !data.autoReelsStart; // Toggle the state
       chrome.storage.sync.set({ autoReelsStart: newState }, () => {
-        toggleAutoScrolling(newState);
+        toggleAutoScrolling(newState); // Start or stop auto-scrolling based on the new state
       });
     });
   });
 
-  document.body.appendChild(toggleWrapper);
+  document.body.appendChild(toggleWrapper); // Append the toggle button to the body
 }
 
 // ✅ Function to update the toggle state visually
@@ -108,59 +108,59 @@ function updateToggleState(isEnabled) {
       ? "radial-gradient(61.46% 59.09% at 36.25% 96.55%, #FFD600 0%, #FF6930 48.44%, #FE3B36 73.44%, rgba(254, 59, 54, 0.00) 100%)"
       : "radial-gradient(61.46% 59.09% at 36.25% 96.55%, rgba(255, 214, 0, 0.10) 0%, rgba(255, 105, 48, 0.10) 48.44%, rgba(254, 59, 54, 0.10) 73.44%, rgba(254, 59, 54, 0.00) 100%)";
 
-    circle.style.left = isEnabled ? "20px" : "2px";
+    circle.style.left = isEnabled ? "20px" : "2px"; // Move the circle based on the toggle state
   }
 }
 
 // ✅ Function to remove toggle when leaving Reels
 function removeToggle() {
   const toggleWrapper = document.querySelector("#myInjectedToggleWrapper");
-  if (toggleWrapper) toggleWrapper.remove();
+  if (toggleWrapper) toggleWrapper.remove(); // Remove the toggle button if it exists
 }
 
 // ✅ Start Auto-Scrolling
 function startAutoScrolling() {
-  console.log("Auto-scrolling enabled");
+  console.log("Auto-scrolling enabled"); // Log the action
   setInterval(() => {
-    if (!appIsRunning) return;
-    const currentVideo = getCurrentVideo();
+    if (!appIsRunning) return; // Exit if the app is not running
+    const currentVideo = getCurrentVideo(); // Get the current video
     if (currentVideo) {
-      currentVideo.removeAttribute("loop");
-      currentVideo.addEventListener("ended", onVideoEnd);
+      currentVideo.removeAttribute("loop"); // Remove loop attribute from the video
+      currentVideo.addEventListener("ended", onVideoEnd); // Add event listener for when the video ends
     }
-  }, 100);
+  }, 100); // Check every 100 milliseconds
 }
 
 // ✅ Stop Auto-Scrolling
 function stopAutoScrolling() {
-  console.log("Auto-scrolling disabled");
+  console.log("Auto-scrolling disabled"); // Log the action
 }
 
 // ✅ Handle video end event
 function onVideoEnd() {
-  if (!appIsRunning) return;
-  const nextVideo = getNextVideo();
-  if (nextVideo) scrollToNextVideo(nextVideo);
+  if (!appIsRunning) return; // Exit if the app is not running
+  const nextVideo = getNextVideo(); // Get the next video
+  if (nextVideo) scrollToNextVideo(nextVideo); // Scroll to the next video if it exists
 }
 
 // ✅ Utility functions
 function getCurrentVideo() {
   return [...document.querySelectorAll("main video")].find((video) => {
     const rect = video.getBoundingClientRect();
-    return rect.top >= 0 && rect.bottom <= window.innerHeight;
+    return rect.top >= 0 && rect.bottom <= window.innerHeight; // Check if the video is in the viewport
   });
 }
 
 function getNextVideo() {
   const videos = document.querySelectorAll("main video");
   const currentIndex = [...videos].findIndex(
-    (video) => video === getCurrentVideo()
+    (video) => video === getCurrentVideo() // Find the index of the current video
   );
-  return videos[currentIndex + 1] || null;
+  return videos[currentIndex + 1] || null; // Return the next video or null if it doesn't exist
 }
 
 function scrollToNextVideo(video) {
-  video.scrollIntoView({ behavior: "smooth", block: "center" });
+  video.scrollIntoView({ behavior: "smooth", block: "center" }); // Scroll to the next video smoothly
 }
 
 // ✅ Listen for URL changes
@@ -168,17 +168,17 @@ new MutationObserver(checkURLAndManageApp).observe(document.body, {
   childList: true,
   subtree: true,
 });
-window.addEventListener("popstate", checkURLAndManageApp);
-checkURLAndManageApp();
+window.addEventListener("popstate", checkURLAndManageApp); // Listen for popstate events
+checkURLAndManageApp(); // Initial check for URL
 
 // ✅ Listen for popup toggle events
 chrome.runtime.onMessage.addListener((message) => {
   if (message.event === "toggleAutoReels") {
-    toggleAutoScrolling(message.state);
+    toggleAutoScrolling(message.state); // Toggle auto-scrolling based on the message state
   }
   if (message.event === "toggleInjectButton") {
     chrome.storage.sync.set({ injectReelsButton: message.state }, () => {
-      injectToggle(message.state);
+      injectToggle(message.state); // Inject toggle button based on the message state
     });
   }
 });

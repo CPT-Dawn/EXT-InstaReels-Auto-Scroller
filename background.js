@@ -2,6 +2,7 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension Installed!");
 });
 
+// Method to handle incoming messages from other parts of the extension
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.event === "toggleAutoReels") {
     chrome.storage.sync.set({ autoReelsStart: message.state }, () => {
