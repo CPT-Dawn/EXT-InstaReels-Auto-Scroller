@@ -4,25 +4,25 @@
   "version": "1.0.0",
   "description": "Auto-scrolls Instagram Reels and optionally injects a toggle button.",
   "icons": {
-    "128": "imgs/icon128.png",
-    "48": "imgs/icon48.png",
-    "38": "imgs/icon38.png",
-    "32": "imgs/icon32.png",
-    "19": "imgs/icon19.png",
-    "16": "imgs/icon16.png"
+    "128": "src/icons/icon128.png",
+    "48": "src/icons/icon48.png",
+    "38": "src/icons/icon38.png",
+    "32": "src/icons/icon32.png",
+    "19": "src/icons/icon19.png",
+    "16": "src/icons/icon16.png"
   },
   "permissions": ["storage", "activeTab", "scripting", "tabs"],
   "content_scripts": [
     {
       "matches": ["https://www.instagram.com/reels/*"],
-      "js": ["content.js"],
+      "js": ["src/scripts/content.js"],
       "run_at": "document_end"
     }
   ],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "src/popup.html"
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "src/scripts/background.js"
   }
 }
