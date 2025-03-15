@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Instagram Auto-Scroller",
-  "version": "1.0.0",
+  "version": "1.0",
   "description": "Auto-scrolls Instagram Reels and optionally injects a toggle button.",
   "icons": {
     "128": "imgs/icon128.png",
