@@ -1,4 +1,4 @@
-# [🎥 Reels Auto Scroller](https://chromewebstore.google.com/detail/instareels-auto-scroller)
+# [🎥 InstaReels Auto Scroller](https://chromewebstore.google.com/detail/instareels-auto-scroller)
 
 **Enjoy Instagram Reels hands-free while you eat, work, or relax!** This extension automatically scrolls through Reels so you can watch without ever touching your screen. Perfect for busy professionals, students, and anyone who loves uninterrupted entertainment.
 
@@ -84,7 +84,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 💬 Feedback & Support
 
-For feedback, suggestions, or issues, please open a [GitHub issue](https://github.com/CPT-Dawn/Reels-Auto-Scroller/issues) or reach out via email.
+For feedback, suggestions, or issues, please open a [GitHub issue](https://github.com/CPT-Dawn/InstaReels-Auto-Scroller/issues) or reach out via email.
 
 ---
 
