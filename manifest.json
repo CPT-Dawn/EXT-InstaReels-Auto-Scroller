@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Instagram Auto-Scroller",
   "version": "1.0.0",
-  "description": "Auto-scrolls Instagram Reels and optionally injects a toggle button.",
+  "description": "Auto-scroll through Instagram Reels hands-free! Enjoy uninterrupted scrolling while eating, working, or multitasking. Stay engaged without lifting a finger! 🚀",
   "icons": {
     "128": "src/icons/icon128.png",
     "48": "src/icons/icon48.png",
