@@ -39,7 +39,7 @@ function injectToggle(isEnabled) {
   toggleWrapper.style.right = "20px";
   toggleWrapper.style.bottom = "80px";
   toggleWrapper.style.zIndex = "1000";
-  toggleWrapper.style.padding = "10px";
+  toggleWrapper.style.padding = "13px";
   toggleWrapper.style.background = "#111827";
   toggleWrapper.style.borderRadius = "50px";
   toggleWrapper.style.display = "flex";
@@ -105,8 +105,8 @@ function updateToggleState(isEnabled) {
 
   if (slider && circle) {
     slider.style.background = isEnabled
-      ? "radial-gradient(61.46% 59.09% at 36.25% 96.55%, #FFD600 0%, #FF6930 48.44%, #FE3B36 73.44%, rgba(254, 59, 54, 0.00) 100%)"
-      : "radial-gradient(61.46% 59.09% at 36.25% 96.55%, rgba(255, 214, 0, 0.10) 0%, rgba(255, 105, 48, 0.10) 48.44%, rgba(254, 59, 54, 0.10) 73.44%, rgba(254, 59, 54, 0.00) 100%)";
+      ? "radial-gradient(61.46% 59.09% at 36.25% 96.55%, #FFD600 0%, #FF6930 48.44%, #FE3B36 73.44%, rgba(254, 59, 54, 0.00) 100%), radial-gradient(202.83% 136.37% at 84.5% 113.5%, #FF1B90 24.39%, #F80261 43.67%, #ED00C0 68.85%, #C500E9 77.68%, #7017FF 89.32%)"
+      : "radial-gradient(61.46% 59.09% at 36.25% 96.55%, rgba(255, 214, 0, 0.10) 0%, rgba(255, 105, 48, 0.10) 48.44%, rgba(254, 59, 54, 0.10) 73.44%, rgba(254, 59, 54, 0.00) 100%), radial-gradient(202.83% 136.37% at 84.5% 113.5%, rgba(255, 27, 144, 0.10) 24.39%, rgba(248, 2, 97, 0.10) 43.67%, rgba(237, 0, 192, 0.10) 68.85%, rgba(197, 0, 233, 0.10) 77.68%, rgba(112, 23, 255, 0.10) 89.32%)";
 
     circle.style.left = isEnabled ? "20px" : "2px"; // Move the circle based on the toggle state
   }
