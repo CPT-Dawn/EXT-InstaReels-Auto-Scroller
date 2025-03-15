@@ -1,43 +1,119 @@
 let isOnReels = false;
 let appIsRunning = false;
 
-// Function to toggle auto-scrolling
-function toggleAutoScrolling(state) {
+// ✅ Function to start or stop auto-scrolling
+function toggleAutoScrolling(state, shouldRefresh = true) {
   appIsRunning = state;
-  chrome.storage.sync.set({ autoReelsStart: state });
-  console.log(`Auto-scrolling ${state ? "started" : "stopped"}.`);
+  chrome.storage.sync.set({ autoReelsStart: state }, () => {
+    updateToggleState(state);
+    if (shouldRefresh) location.reload(); // ✅ Refresh only when the toggle changes
+  });
+
   state ? startAutoScrolling() : stopAutoScrolling();
 }
 
-// Function to check if we are on the Reels page and apply changes
+// ✅ Check if we are on the Reels page and apply changes
 function checkURLAndManageApp() {
-  const isOnReelsPage = window.location.href.startsWith(
-    "https://www.instagram.com/reels/"
-  );
+  const isOnReelsPage = window.location.href.startsWith("https://www.instagram.com/reels/");
 
   if (isOnReelsPage && !isOnReels) {
     isOnReels = true;
-    chrome.storage.sync.get(
-      ["autoReelsStart", "injectReelsButton"],
-      (result) => {
-        if (result.autoReelsStart) toggleAutoScrolling(true);
-        if (result.injectReelsButton) injectButton();
-      }
-    );
+    chrome.storage.sync.get(["autoReelsStart", "injectReelsButton"], (result) => {
+      if (result.autoReelsStart) toggleAutoScrolling(true, false); // ✅ No refresh on first load
+      if (result.injectReelsButton) injectToggle(result.autoReelsStart);
+    });
   } else if (!isOnReelsPage && isOnReels) {
     isOnReels = false;
-    toggleAutoScrolling(false);
-    removeButton(); // Hide the button when leaving Reels
+    toggleAutoScrolling(false, false);
+    removeToggle();
   }
 }
 
-// Function to remove the injected button when leaving Reels
-function removeButton() {
-  const button = document.querySelector("#myInjectedButton");
-  if (button) button.remove();
+// ✅ Function to inject a toggle button in Reels
+function injectToggle(isEnabled) {
+  removeToggle(); // ✅ Prevent duplicates
+
+  const toggleWrapper = document.createElement("div");
+  toggleWrapper.id = "myInjectedToggleWrapper";
+  toggleWrapper.style.position = "fixed";
+  toggleWrapper.style.right = "20px";
+  toggleWrapper.style.bottom = "80px";
+  toggleWrapper.style.zIndex = "1000";
+  toggleWrapper.style.padding = "10px";
+  toggleWrapper.style.background = "#111827";
+  toggleWrapper.style.borderRadius = "50px";
+  toggleWrapper.style.display = "flex";
+  toggleWrapper.style.alignItems = "center";
+  toggleWrapper.style.gap = "10px";
+  toggleWrapper.style.cursor = "pointer";
+  toggleWrapper.style.boxShadow = "0px 4px 10px rgba(0, 0, 0, 0.1)";
+  toggleWrapper.style.transition = "background 0.3s ease";
+
+  const label = document.createElement("p");
+  label.innerText = "Auto-Scroll";
+  label.style.color = "#FFF";
+  label.style.fontSize = "14px";
+  label.style.margin = "0";
+
+  const toggle = document.createElement("input");
+  toggle.type = "checkbox";
+  toggle.id = "myInjectedToggle";
+  toggle.style.display = "none";
+  toggle.checked = isEnabled;
+
+  const slider = document.createElement("span");
+  slider.className = "slider";
+  slider.style.width = "40px";
+  slider.style.height = "20px";
+  slider.style.background = isEnabled ? "#FFD600" : "#666";
+  slider.style.borderRadius = "50px";
+  slider.style.position = "relative";
+  slider.style.transition = "background 0.3s";
+
+  const circle = document.createElement("span");
+  circle.style.position = "absolute";
+  circle.style.width = "18px";
+  circle.style.height = "18px";
+  circle.style.background = "white";
+  circle.style.borderRadius = "50%";
+  circle.style.top = "1px";
+  circle.style.left = isEnabled ? "20px" : "2px";
+  circle.style.transition = "left 0.3s";
+
+  slider.appendChild(circle);
+  toggleWrapper.appendChild(label);
+  toggleWrapper.appendChild(slider);
+
+  toggleWrapper.addEventListener("click", () => {
+    chrome.storage.sync.get("autoReelsStart", (data) => {
+      const newState = !data.autoReelsStart;
+      chrome.storage.sync.set({ autoReelsStart: newState }, () => {
+        toggleAutoScrolling(newState); // ✅ Only refreshes when the toggle is clicked
+      });
+    });
+  });
+
+  document.body.appendChild(toggleWrapper);
 }
 
-// Function to start auto-scrolling
+// ✅ Function to update the toggle state visually
+function updateToggleState(isEnabled) {
+  const slider = document.querySelector("#myInjectedToggleWrapper .slider");
+  const circle = slider?.querySelector("span");
+
+  if (slider && circle) {
+    slider.style.background = isEnabled ? "#FFD600" : "#666";
+    circle.style.left = isEnabled ? "20px" : "2px";
+  }
+}
+
+// ✅ Function to remove toggle when leaving Reels
+function removeToggle() {
+  const toggleWrapper = document.querySelector("#myInjectedToggleWrapper");
+  if (toggleWrapper) toggleWrapper.remove();
+}
+
+// ✅ Start Auto-Scrolling
 function startAutoScrolling() {
   console.log("Auto-scrolling enabled");
   setInterval(() => {
@@ -50,19 +126,19 @@ function startAutoScrolling() {
   }, 100);
 }
 
-// Function to stop auto-scrolling
+// ✅ Stop Auto-Scrolling
 function stopAutoScrolling() {
   console.log("Auto-scrolling disabled");
 }
 
-// Function to handle video end event
+// ✅ Handle video end event
 function onVideoEnd() {
   if (!appIsRunning) return;
   const nextVideo = getNextVideo();
   if (nextVideo) scrollToNextVideo(nextVideo);
 }
 
-// Utility functions
+// ✅ Utility functions
 function getCurrentVideo() {
   return [...document.querySelectorAll("main video")].find((video) => {
     const rect = video.getBoundingClientRect();
@@ -82,43 +158,7 @@ function scrollToNextVideo(video) {
   video.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
-// Function to inject a button into the Reels page
-function injectButton() {
-  if (document.querySelector("#myInjectedButton")) return; // Prevent duplicate buttons
-
-  const button = document.createElement("button");
-  button.innerText = "Auto Scroll";
-  button.id = "myInjectedButton";
-  button.style.position = "fixed";
-  button.style.right = "20px";
-  button.style.bottom = "80px";
-  button.style.zIndex = "1000";
-  button.style.padding = "10px";
-  button.style.backgroundColor = "#0095F6";
-  button.style.color = "white";
-  button.style.border = "none";
-  button.style.borderRadius = "5px";
-  button.style.cursor = "pointer";
-  button.style.fontSize = "14px";
-
-  document.body.appendChild(button);
-
-  // ✅ Add click event to toggle auto-scrolling
-  button.addEventListener("click", () => {
-    chrome.storage.sync.get("autoReelsStart", (data) => {
-      const newState = !data.autoReelsStart; // Toggle state
-      chrome.storage.sync.set({ autoReelsStart: newState }, () => {
-        chrome.runtime.sendMessage({
-          event: "toggleAutoReels",
-          state: newState,
-        });
-        location.reload(); // Refresh to apply changes
-      });
-    });
-  });
-}
-
-// Observer to track URL changes and apply logic
+// ✅ Listen for URL changes
 new MutationObserver(checkURLAndManageApp).observe(document.body, {
   childList: true,
   subtree: true,
@@ -126,16 +166,14 @@ new MutationObserver(checkURLAndManageApp).observe(document.body, {
 window.addEventListener("popstate", checkURLAndManageApp);
 checkURLAndManageApp();
 
-// Listener for popup toggle events
+// ✅ Listen for popup toggle events
 chrome.runtime.onMessage.addListener((message) => {
   if (message.event === "toggleAutoReels") {
     toggleAutoScrolling(message.state);
-    location.reload(); // ✅ Refresh page on toggle change
   }
   if (message.event === "toggleInjectButton") {
     chrome.storage.sync.set({ injectReelsButton: message.state }, () => {
-      console.log("Inject Button state updated:", message.state);
-      location.reload(); // ✅ Refresh to apply button visibility
+      injectToggle(message.state);
     });
   }
 });
