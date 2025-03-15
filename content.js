@@ -6,7 +6,7 @@ function toggleAutoScrolling(state, shouldRefresh = true) {
   appIsRunning = state;
   chrome.storage.sync.set({ autoReelsStart: state }, () => {
     updateToggleState(state);
-    if (shouldRefresh) location.reload(); // ✅ Refresh only when the toggle changes
+    if (shouldRefresh) location.reload();
   });
 
   state ? startAutoScrolling() : stopAutoScrolling();
@@ -19,7 +19,7 @@ function checkURLAndManageApp() {
   if (isOnReelsPage && !isOnReels) {
     isOnReels = true;
     chrome.storage.sync.get(["autoReelsStart", "injectReelsButton"], (result) => {
-      if (result.autoReelsStart) toggleAutoScrolling(true, false); // ✅ No refresh on first load
+      if (result.autoReelsStart) toggleAutoScrolling(true, false);
       if (result.injectReelsButton) injectToggle(result.autoReelsStart);
     });
   } else if (!isOnReelsPage && isOnReels) {
@@ -31,7 +31,7 @@ function checkURLAndManageApp() {
 
 // ✅ Function to inject a toggle button in Reels
 function injectToggle(isEnabled) {
-  removeToggle(); // ✅ Prevent duplicates
+  removeToggle(); // Prevent duplicates
 
   const toggleWrapper = document.createElement("div");
   toggleWrapper.id = "myInjectedToggleWrapper";
@@ -65,10 +65,12 @@ function injectToggle(isEnabled) {
   slider.className = "slider";
   slider.style.width = "40px";
   slider.style.height = "20px";
-  slider.style.background = isEnabled ? "#FFD600" : "#666";
   slider.style.borderRadius = "50px";
   slider.style.position = "relative";
   slider.style.transition = "background 0.3s";
+  slider.style.background = isEnabled
+    ? "radial-gradient(61.46% 59.09% at 36.25% 96.55%, #FFD600 0%, #FF6930 48.44%, #FE3B36 73.44%, rgba(254, 59, 54, 0.00) 100%)"
+    : "radial-gradient(61.46% 59.09% at 36.25% 96.55%, rgba(255, 214, 0, 0.10) 0%, rgba(255, 105, 48, 0.10) 48.44%, rgba(254, 59, 54, 0.10) 73.44%, rgba(254, 59, 54, 0.00) 100%)";
 
   const circle = document.createElement("span");
   circle.style.position = "absolute";
@@ -88,7 +90,7 @@ function injectToggle(isEnabled) {
     chrome.storage.sync.get("autoReelsStart", (data) => {
       const newState = !data.autoReelsStart;
       chrome.storage.sync.set({ autoReelsStart: newState }, () => {
-        toggleAutoScrolling(newState); // ✅ Only refreshes when the toggle is clicked
+        toggleAutoScrolling(newState);
       });
     });
   });
@@ -102,7 +104,10 @@ function updateToggleState(isEnabled) {
   const circle = slider?.querySelector("span");
 
   if (slider && circle) {
-    slider.style.background = isEnabled ? "#FFD600" : "#666";
+    slider.style.background = isEnabled
+      ? "radial-gradient(61.46% 59.09% at 36.25% 96.55%, #FFD600 0%, #FF6930 48.44%, #FE3B36 73.44%, rgba(254, 59, 54, 0.00) 100%)"
+      : "radial-gradient(61.46% 59.09% at 36.25% 96.55%, rgba(255, 214, 0, 0.10) 0%, rgba(255, 105, 48, 0.10) 48.44%, rgba(254, 59, 54, 0.10) 73.44%, rgba(254, 59, 54, 0.00) 100%)";
+
     circle.style.left = isEnabled ? "20px" : "2px";
   }
 }
