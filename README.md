@@ -48,7 +48,7 @@
 
 ## 🚀 Installation
 
-1. Download and install the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/instareels-auto-scroller).
+1. Download and install the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/instareels-auto-scroller/mlmllpiifbmfnopepamjhbdedfjajgcl).
 2. Open Instagram and go to Reels.
 3. Enable auto-scroll and enjoy a **hands-free experience**!
 
