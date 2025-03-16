@@ -84,7 +84,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 💬 Feedback & Support
 
-For feedback, suggestions, or issues, please open a [GitHub issue](https://github.com/CPT-Dawn/InstaReels-Auto-Scroller/issues) or reach out via email.
+For feedback, suggestions, or issues, please open a [GitHub issue](https://github.com/CPT-Dawn/EXT-InstaReels-Auto-Scroller/issues) or reach out via email.
 
 ---
 
