@@ -1,8 +1,8 @@
-# [🎥 InstaReels Auto Scroller](https://chromewebstore.google.com/detail/instareels-auto-scroller)
+# [🎥 InstaReels Auto Scroller](https://chromewebstore.google.com/detail/instareels-auto-scroller/mlmllpiifbmfnopepamjhbdedfjajgcl)
 
 **Enjoy Instagram Reels hands-free while you eat, work, or relax!** This extension automatically scrolls through Reels so you can watch without ever touching your screen. Perfect for busy professionals, students, and anyone who loves uninterrupted entertainment.
 
-[![Chrome Extension](https://img.shields.io/badge/Instagram-Extension-purple?style=flat-square)](https://chromewebstore.google.com/)
+[![Chrome Extension](https://img.shields.io/badge/Instagram-Extension-purple?style=flat-square)]([https://chromewebstore.google.com/](https://chromewebstore.google.com/detail/instareels-auto-scroller/mlmllpiifbmfnopepamjhbdedfjajgcl))
 ![MIT License](https://img.shields.io/github/license/CPT-Dawn/EXT-Playback-Speed-Finish-Time-Calculator-for-YouTube?style=flat-square)
 ![Version](https://img.shields.io/badge/version-1.0.0-brightgreen?style=flat-square)
 
