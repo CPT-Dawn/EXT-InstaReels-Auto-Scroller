@@ -1,91 +1,79 @@
-# [🎥 InstaReels Auto Scroller](https://chromewebstore.google.com/detail/instareels-auto-scroller/mlmllpiifbmfnopepamjhbdedfjajgcl)
+# EXT-InstaReels-Auto-Scroller 🚀
 
-**Enjoy Instagram Reels hands-free while you eat, work, or relax!** This extension automatically scrolls through Reels so you can watch without ever touching your screen. Perfect for busy professionals, students, and anyone who loves uninterrupted entertainment.
-
-[![Chrome Extension](https://img.shields.io/badge/Instagram-Extension-purple?style=flat-square)]([https://chromewebstore.google.com/](https://chromewebstore.google.com/detail/instareels-auto-scroller/mlmllpiifbmfnopepamjhbdedfjajgcl))
-![MIT License](https://img.shields.io/github/license/CPT-Dawn/EXT-Playback-Speed-Finish-Time-Calculator-for-YouTube?style=flat-square)
-![Version](https://img.shields.io/badge/version-1.0.0-brightgreen?style=flat-square)
+Effortless, uninterrupted Instagram Reels—no hands required!
 
 ---
 
-## 🌟 Introduction
+## 🎬 What is EXT-InstaReels-Auto-Scroller?
 
-**Tired of manually scrolling through Instagram Reels?** Let InstaReels Auto-Scroller do it for you! Whether you're eating, working, or simply relaxing, this smart extension ensures you enjoy Reels **without lifting a finger**.
-
----
-
-## ✨ Features at a Glance
-
-- **🤖 Auto-Scroll Mode**
-  Automatically scrolls to the next Reel after the current one finishes.
-
-- **📌 Toggle Auto-Scroll**
-  Enable or disable auto-scrolling anytime with a simple switch.
-
-- **🆕 Inject Toggle Button in Reels**
-  Adds a toggle button inside Instagram Reels for quick access.
-
-- **🚀 Hands-Free Watching**
-  Enjoy reels while eating, cooking, working, or multitasking!
-
-- **🌙 Minimal UI**
-  Simple, clean, and easy-to-use design that blends seamlessly with Instagram.
+**EXT-InstaReels-Auto-Scroller** is a sleek browser extension that brings hands-free enjoyment to Instagram Reels. Whether you’re eating, working, or just want to binge-watch with zero effort, this extension automatically scrolls through Reels for you. Sit back, relax, and let the content flow!
 
 ---
 
-## 🎯 Why Choose InstaReels Auto-Scroller?
+## ✨ Features
 
-- **👐 Hands-Free Entertainment**
-  Watch reels without tapping your screen – just sit back and enjoy!
-
-- **💼 Perfect for Work & Study**
-  Let reels play in the background while you focus on tasks.
-
-- **🛠 Easy to Use**
-  Just install, toggle auto-scroll, and let it do the rest.
+- **Automatic Reels Scrolling:** Watch Reels back-to-back without lifting a finger.
+- **Seamless Experience:** Enjoy uninterrupted playback—perfect for multitasking or relaxing.
+- **Customizable Timing:** Adjust scroll speed to match your pace.
+- **Lightweight & Fast:** Built with JavaScript, CSS, and HTML for maximum performance.
+- **Easy to Use:** Simple one-click activation.
 
 ---
 
 ## 🚀 Installation
 
-1. Download and install the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/instareels-auto-scroller/mlmllpiifbmfnopepamjhbdedfjajgcl).
-2. Open Instagram and go to Reels.
-3. Enable auto-scroll and enjoy a **hands-free experience**!
+1. **Clone or Download the Repository:**
+   ```bash
+   git clone https://github.com/CPT-Dawn/EXT-InstaReels-Auto-Scroller.git
+   cd EXT-InstaReels-Auto-Scroller
+   ```
+
+2. **Load the Extension in Chrome:**
+   - Go to `chrome://extensions`
+   - Enable "Developer mode"
+   - Click "Load unpacked"
+   - Select the cloned project folder
+
+3. **Open Instagram and Start Browsing Reels!**
 
 ---
 
-## 🛠️ How to Use
+## ⚙️ Usage
 
-1. Open Instagram Reels.
-2. Click the **extension icon** to access settings.
-3. Toggle **Auto-Scroll** to enable hands-free viewing.
-4. (Optional) Enable **Inject Toggle Button** for quick access inside Reels.
-5. Enjoy non-stop Reels without touching your screen!
-
----
-
-## 💡 Contributing
-
-Want to improve InstaReels Auto-Scroller? Contributions are welcome!
-
-1. Fork this repository.
-2. Create a new branch: `git checkout -b feature-branch`.
-3. Make your changes and commit: `git commit -m 'Added new feature'`.
-4. Push the changes: `git push origin feature-branch`.
-5. Submit a pull request.
+- Visit Instagram’s Reels section.
+- Click the extension icon to enable/disable auto-scrolling.
+- Adjust scroll speed via the extension popup/settings (if available).
+- Sit back and enjoy a hands-free Reels marathon!
 
 ---
 
-## 📝 License
+## 💡 Why Use This Extension?
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-## 💬 Feedback & Support
-
-For feedback, suggestions, or issues, please open a [GitHub issue](https://github.com/CPT-Dawn/EXT-InstaReels-Auto-Scroller/issues) or reach out via email.
+- **Perfect for Multitasking:** Watch Reels while eating, working, or relaxing without interruptions.
+- **Cleaner, Smoother Experience:** No more repetitive swiping or clicking.
+- **Open Source:** Tweak and improve to suit your preferences!
 
 ---
 
-“**Automation should make life easier, not harder.**” — **InstaReels Auto-Scroller** 🚀
+## 🛠️ Technologies Used
+
+- JavaScript (72%)
+- CSS (21%)
+- HTML (7%)
+
+---
+
+## 📜 License
+
+MIT — see [LICENSE](LICENSE) for details.
+
+---
+
+## 🌟 Inspiration
+
+> “Let the good Reels roll—hands-free.”  
+> — The Internet
+
+---
+
+## ⭐ Star this repo if you love effortless Reel marathons!
