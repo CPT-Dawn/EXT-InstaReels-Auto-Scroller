@@ -22,19 +22,8 @@ Effortless, uninterrupted Instagram Reels—no hands required!
 
 ## 🚀 Installation
 
-1. **Clone or Download the Repository:**
-   ```bash
-   git clone https://github.com/CPT-Dawn/EXT-InstaReels-Auto-Scroller.git
-   cd EXT-InstaReels-Auto-Scroller
-   ```
-
-2. **Load the Extension in Chrome:**
-   - Go to `chrome://extensions`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select the cloned project folder
-
-3. **Open Instagram and Start Browsing Reels!**
+1. Download and install the extension from the [Chrome Web Store]([https://chromewebstore.google.com/detail/youtube-playback-speed-fi/albpnoibahehboglkghilhljilchnfbo?authuser=0&hl=en](https://chromewebstore.google.com/detail/instareels-auto-scroller/mlmllpiifbmfnopepamjhbdedfjajgcl?hl=en&authuser=0)).
+2. Start watching videos with a more productive, seamless experience!
 
 ---
 
