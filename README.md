@@ -22,7 +22,7 @@ Effortless, uninterrupted Instagram Reels—no hands required!
 
 ## 🚀 Installation
 
-1. Download and install the extension from the [Chrome Web Store]([https://chromewebstore.google.com/detail/youtube-playback-speed-fi/albpnoibahehboglkghilhljilchnfbo?authuser=0&hl=en](https://chromewebstore.google.com/detail/instareels-auto-scroller/mlmllpiifbmfnopepamjhbdedfjajgcl?hl=en&authuser=0)).
+1. Download and install the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/instareels-auto-scroller/mlmllpiifbmfnopepamjhbdedfjajgcl?hl=en&authuser=0).
 2. Start watching videos with a more productive, seamless experience!
 
 ---
