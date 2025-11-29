@@ -142,7 +142,7 @@ function injectStyles() {
     
     .injected-wrapper {
       position: fixed;
-      top: 80px;
+      top: 30px;
       right: 20px;
       z-index: 9999;
       background: var(--card-bg);
