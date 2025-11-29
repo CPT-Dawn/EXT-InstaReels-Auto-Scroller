@@ -2,10 +2,10 @@
 :root {
   --instagram-gradient: linear-gradient(45deg, #FFD600, #FF0169, #D300C5);
   --instagram-gradient-hover: linear-gradient(45deg, #FFC107, #E91E63, #9C27B0);
-  --bg-color: #0f0f0f;
-  --card-bg: linear-gradient(135deg, #212121 0%, #181818 100%);
+  --bg-color: #050505; /* Deeper black */
+  --card-bg: linear-gradient(135deg, #1a1a1a 0%, #121212 100%); /* Subtle gradient */
   --text-primary: #ffffff;
-  --text-secondary: #aaaaaa;
+  --text-secondary: #a0a0a0;
 }
 
 * {

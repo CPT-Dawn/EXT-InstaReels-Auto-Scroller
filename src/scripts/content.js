@@ -128,61 +128,145 @@ new MutationObserver(() => {
   }
 }).observe(document, { subtree: true, childList: true });
 
+// ✅ Inject Styles
+function injectStyles() {
+  if (document.getElementById("instaReelsStyles")) return;
+  const style = document.createElement("style");
+  style.id = "instaReelsStyles";
+  style.textContent = `
+    :root {
+      --instagram-gradient: linear-gradient(45deg, #FFD600, #FF0169, #D300C5);
+      --instagram-gradient-hover: linear-gradient(45deg, #FFC107, #E91E63, #9C27B0);
+      --card-bg: linear-gradient(135deg, #1a1a1a 0%, #121212 100%);
+    }
+    
+    .injected-wrapper {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 9999;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      backdrop-filter: blur(10px);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .injected-wrapper:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 1, 105, 0.2);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 1, 105, 0.1);
+    }
+
+    .injected-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+
+    .injected-wrapper:hover .injected-icon {
+      background: rgba(255, 1, 105, 0.15);
+      color: #FF0169;
+      transform: rotate(5deg);
+    }
+
+    .injected-label {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    /* Toggle Switch */
+    .injected-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .injected-slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #3f3f3f;
+      border-radius: 24px;
+      transition: 0.3s;
+    }
+
+    .injected-slider::before {
+      content: "";
+      position: absolute;
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background: #fff;
+      border-radius: 50%;
+      transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .injected-switch.active .injected-slider {
+      background: var(--instagram-gradient);
+      box-shadow: 0 0 12px rgba(255, 1, 105, 0.4);
+    }
+
+    .injected-switch.active .injected-slider::before {
+      transform: translateX(20px);
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 // ✅ Inject Toggle Button
 function injectToggle(isEnabled) {
   if (document.getElementById("myInjectedToggleWrapper")) return;
+  injectStyles();
 
   const toggleWrapper = document.createElement("div");
   toggleWrapper.id = "myInjectedToggleWrapper";
-  Object.assign(toggleWrapper.style, {
-    position: "fixed",
-    right: "20px",
-    bottom: "80px",
-    zIndex: "1000",
-    padding: "13px",
-    background: "#111827",
-    borderRadius: "50px",
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    cursor: "pointer",
-    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-    transition: "background 0.3s ease",
-  });
+  toggleWrapper.className = "injected-wrapper";
 
+  // Icon
+  const iconDiv = document.createElement("div");
+  iconDiv.className = "injected-icon";
+  iconDiv.innerHTML = `
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 4V20M12 20L8 16M12 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `;
+
+  // Label
   const label = document.createElement("p");
+  label.className = "injected-label";
   label.innerText = "Auto-Scroll";
-  Object.assign(label.style, {
-    color: "#FFF",
-    fontSize: "14px",
-    margin: "0",
-  });
 
+  // Switch
+  const switchDiv = document.createElement("div");
+  switchDiv.className = `injected-switch ${isEnabled ? "active" : ""}`;
   const slider = document.createElement("span");
-  slider.className = "slider";
-  Object.assign(slider.style, {
-    width: "40px",
-    height: "20px",
-    borderRadius: "50px",
-    position: "relative",
-    transition: "background 0.3s",
-    display: "block",
-  });
+  slider.className = "injected-slider";
+  switchDiv.appendChild(slider);
 
-  const circle = document.createElement("span");
-  Object.assign(circle.style, {
-    position: "absolute",
-    width: "18px",
-    height: "18px",
-    background: "white",
-    borderRadius: "50%",
-    top: "1px",
-    transition: "left 0.3s",
-  });
-
-  slider.appendChild(circle);
+  toggleWrapper.appendChild(iconDiv);
   toggleWrapper.appendChild(label);
-  toggleWrapper.appendChild(slider);
+  toggleWrapper.appendChild(switchDiv);
 
   toggleWrapper.addEventListener("click", () => {
     const newState = !autoScrollEnabled;
@@ -190,20 +274,17 @@ function injectToggle(isEnabled) {
   });
 
   document.body.appendChild(toggleWrapper);
-  updateToggleState(isEnabled);
 }
 
 // ✅ Update Toggle Visuals
 function updateToggleState(isEnabled) {
-  const slider = document.querySelector("#myInjectedToggleWrapper .slider");
-  const circle = slider?.querySelector("span");
-
-  if (slider && circle) {
-    slider.style.background = isEnabled
-      ? "radial-gradient(61.46% 59.09% at 36.25% 96.55%, #FFD600 0%, #FF6930 48.44%, #FE3B36 73.44%, rgba(254, 59, 54, 0.00) 100%)"
-      : "rgba(255, 255, 255, 0.2)";
-    
-    circle.style.left = isEnabled ? "20px" : "2px";
+  const switchDiv = document.querySelector("#myInjectedToggleWrapper .injected-switch");
+  if (switchDiv) {
+    if (isEnabled) {
+      switchDiv.classList.add("active");
+    } else {
+      switchDiv.classList.remove("active");
+    }
   }
 }
 
