@@ -1,184 +1,217 @@
-let isOnReels = false;
-let appIsRunning = false;
+let autoScrollEnabled = false;
+let showToggleEnabled = false;
+let currentVideo = null;
+let videoObserver = null;
+let pageObserver = null;
 
-// ✅ Function to start or stop auto-scrolling
-function toggleAutoScrolling(state, shouldRefresh = true) {
-  appIsRunning = state; // Set the application state to the provided state
-  chrome.storage.sync.set({ autoReelsStart: state }, () => {
-    updateToggleState(state); // Update the visual state of the toggle
-    if (shouldRefresh) location.reload(); // Reload the page if shouldRefresh is true
+// ✅ Initialize the extension
+function init() {
+  chrome.storage.sync.get(["autoReelsStart", "injectReelsButton"], (data) => {
+    autoScrollEnabled = data.autoReelsStart || false;
+    showToggleEnabled = data.injectReelsButton || false;
+    checkPage();
   });
-
-  state ? startAutoScrolling() : stopAutoScrolling(); // Start or stop auto-scrolling based on the state
 }
 
-// ✅ Check if we are on the Reels page and apply changes
-function checkURLAndManageApp() {
-  const isOnReelsPage = window.location.href.startsWith("https://www.instagram.com/reels/");
+// ✅ Listen for storage changes (Dynamic Updates)
+chrome.storage.onChanged.addListener((changes) => {
+  if (changes.autoReelsStart) {
+    autoScrollEnabled = changes.autoReelsStart.newValue;
+    updateToggleState(autoScrollEnabled);
+    if (autoScrollEnabled && currentVideo) {
+      setupVideoListener(currentVideo);
+    }
+  }
+});
 
-  if (isOnReelsPage && !isOnReels) {
-    isOnReels = true; // Update the state to indicate we are on the Reels page
-    chrome.storage.sync.get(["autoReelsStart", "injectReelsButton"], (result) => {
-      if (result.autoReelsStart) toggleAutoScrolling(true, false); // Start auto-scrolling if enabled
-      if (result.injectReelsButton) injectToggle(result.autoReelsStart); // Inject toggle button if enabled
-    });
-  } else if (!isOnReelsPage && isOnReels) {
-    isOnReels = false; // Update the state to indicate we are leaving the Reels page
-    toggleAutoScrolling(false, false); // Stop auto-scrolling
-    removeToggle(); // Remove the toggle button
+// ✅ Check if current page is Reels
+function isReelsPage() {
+  return window.location.href.startsWith("https://www.instagram.com/reels/");
+}
+
+// ✅ Main Logic to Start/Stop App based on URL
+function checkPage() {
+  if (isReelsPage()) {
+    if (showToggleEnabled) injectToggle(autoScrollEnabled);
+    setupObservers();
+  } else {
+    cleanup();
   }
 }
 
-// ✅ Function to inject a toggle button in Reels
+// ✅ Setup Observers
+function setupObservers() {
+  if (videoObserver) return; // Already set up
+
+  // IntersectionObserver to detect the active video
+  videoObserver = new IntersectionObserver(handleVideoIntersection, {
+    threshold: 0.7, // Video is considered "active" when 70% visible
+  });
+
+  // MutationObserver to detect new videos loading (Infinite Scroll)
+  pageObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType === 1) {
+          const videos = node.querySelectorAll ? node.querySelectorAll("video") : [];
+          videos.forEach((video) => videoObserver.observe(video));
+          if (node.tagName === "VIDEO") videoObserver.observe(node);
+        }
+      });
+    });
+  });
+
+  pageObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Observe existing videos
+  document.querySelectorAll("video").forEach((video) => videoObserver.observe(video));
+}
+
+// ✅ Handle Video Intersection
+function handleVideoIntersection(entries) {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      currentVideo = entry.target;
+      if (autoScrollEnabled) {
+        setupVideoListener(currentVideo);
+      }
+    }
+  });
+}
+
+// ✅ Setup Video End Listener
+function setupVideoListener(video) {
+  video.removeAttribute("loop");
+  video.removeEventListener("ended", onVideoEnd); // Prevent duplicates
+  video.addEventListener("ended", onVideoEnd);
+}
+
+// ✅ Handle Video End -> Scroll to Next
+function onVideoEnd() {
+  if (!autoScrollEnabled) return;
+  
+  const nextVideo = getNextVideo();
+  if (nextVideo) {
+    nextVideo.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
+// ✅ Find the next video in the DOM
+function getNextVideo() {
+  if (!currentVideo) return null;
+  const videos = Array.from(document.querySelectorAll("video"));
+  const currentIndex = videos.indexOf(currentVideo);
+  return videos[currentIndex + 1] || null;
+}
+
+// ✅ Cleanup function
+function cleanup() {
+  removeToggle();
+  if (videoObserver) {
+    videoObserver.disconnect();
+    videoObserver = null;
+  }
+  if (pageObserver) {
+    pageObserver.disconnect();
+    pageObserver = null;
+  }
+  currentVideo = null;
+}
+
+// ✅ Listen for URL changes (SPA navigation)
+let lastUrl = location.href;
+new MutationObserver(() => {
+  const url = location.href;
+  if (url !== lastUrl) {
+    lastUrl = url;
+    checkPage();
+  }
+}).observe(document, { subtree: true, childList: true });
+
+// ✅ Inject Toggle Button
 function injectToggle(isEnabled) {
-  removeToggle(); // Prevent duplicates
+  if (document.getElementById("myInjectedToggleWrapper")) return;
 
   const toggleWrapper = document.createElement("div");
   toggleWrapper.id = "myInjectedToggleWrapper";
-  toggleWrapper.style.position = "fixed";
-  toggleWrapper.style.right = "20px";
-  toggleWrapper.style.bottom = "80px";
-  toggleWrapper.style.zIndex = "1000";
-  toggleWrapper.style.padding = "13px";
-  toggleWrapper.style.background = "#111827";
-  toggleWrapper.style.borderRadius = "50px";
-  toggleWrapper.style.display = "flex";
-  toggleWrapper.style.alignItems = "center";
-  toggleWrapper.style.gap = "10px";
-  toggleWrapper.style.cursor = "pointer";
-  toggleWrapper.style.boxShadow = "0px 4px 10px rgba(0, 0, 0, 0.1)";
-  toggleWrapper.style.transition = "background 0.3s ease";
+  Object.assign(toggleWrapper.style, {
+    position: "fixed",
+    right: "20px",
+    bottom: "80px",
+    zIndex: "1000",
+    padding: "13px",
+    background: "#111827",
+    borderRadius: "50px",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    cursor: "pointer",
+    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+    transition: "background 0.3s ease",
+  });
 
   const label = document.createElement("p");
   label.innerText = "Auto-Scroll";
-  label.style.color = "#FFF";
-  label.style.fontSize = "14px";
-  label.style.margin = "0";
-
-  const toggle = document.createElement("input");
-  toggle.type = "checkbox";
-  toggle.id = "myInjectedToggle";
-  toggle.style.display = "none";
-  toggle.checked = isEnabled;
+  Object.assign(label.style, {
+    color: "#FFF",
+    fontSize: "14px",
+    margin: "0",
+  });
 
   const slider = document.createElement("span");
   slider.className = "slider";
-  slider.style.width = "40px";
-  slider.style.height = "20px";
-  slider.style.borderRadius = "50px";
-  slider.style.position = "relative";
-  slider.style.transition = "background 0.3s";
-  slider.style.background = isEnabled
-    ? "radial-gradient(61.46% 59.09% at 36.25% 96.55%, #FFD600 0%, #FF6930 48.44%, #FE3B36 73.44%, rgba(254, 59, 54, 0.00) 100%)"
-    : "radial-gradient(61.46% 59.09% at 36.25% 96.55%, rgba(255, 214, 0, 0.10) 0%, rgba(255, 105, 48, 0.10) 48.44%, rgba(254, 59, 54, 0.10) 73.44%, rgba(254, 59, 54, 0.00) 100%)";
+  Object.assign(slider.style, {
+    width: "40px",
+    height: "20px",
+    borderRadius: "50px",
+    position: "relative",
+    transition: "background 0.3s",
+    display: "block",
+  });
 
   const circle = document.createElement("span");
-  circle.style.position = "absolute";
-  circle.style.width = "18px";
-  circle.style.height = "18px";
-  circle.style.background = "white";
-  circle.style.borderRadius = "50%";
-  circle.style.top = "1px";
-  circle.style.left = isEnabled ? "20px" : "2px";
-  circle.style.transition = "left 0.3s";
+  Object.assign(circle.style, {
+    position: "absolute",
+    width: "18px",
+    height: "18px",
+    background: "white",
+    borderRadius: "50%",
+    top: "1px",
+    transition: "left 0.3s",
+  });
 
   slider.appendChild(circle);
   toggleWrapper.appendChild(label);
   toggleWrapper.appendChild(slider);
 
   toggleWrapper.addEventListener("click", () => {
-    chrome.storage.sync.get("autoReelsStart", (data) => {
-      const newState = !data.autoReelsStart; // Toggle the state
-      chrome.storage.sync.set({ autoReelsStart: newState }, () => {
-        toggleAutoScrolling(newState); // Start or stop auto-scrolling based on the new state
-      });
-    });
+    const newState = !autoScrollEnabled;
+    chrome.storage.sync.set({ autoReelsStart: newState });
   });
 
-  document.body.appendChild(toggleWrapper); // Append the toggle button to the body
+  document.body.appendChild(toggleWrapper);
+  updateToggleState(isEnabled);
 }
 
-// ✅ Function to update the toggle state visually
+// ✅ Update Toggle Visuals
 function updateToggleState(isEnabled) {
   const slider = document.querySelector("#myInjectedToggleWrapper .slider");
   const circle = slider?.querySelector("span");
 
   if (slider && circle) {
     slider.style.background = isEnabled
-      ? "radial-gradient(61.46% 59.09% at 36.25% 96.55%, #FFD600 0%, #FF6930 48.44%, #FE3B36 73.44%, rgba(254, 59, 54, 0.00) 100%), radial-gradient(202.83% 136.37% at 84.5% 113.5%, #FF1B90 24.39%, #F80261 43.67%, #ED00C0 68.85%, #C500E9 77.68%, #7017FF 89.32%)"
-      : "radial-gradient(61.46% 59.09% at 36.25% 96.55%, rgba(255, 214, 0, 0.10) 0%, rgba(255, 105, 48, 0.10) 48.44%, rgba(254, 59, 54, 0.10) 73.44%, rgba(254, 59, 54, 0.00) 100%), radial-gradient(202.83% 136.37% at 84.5% 113.5%, rgba(255, 27, 144, 0.10) 24.39%, rgba(248, 2, 97, 0.10) 43.67%, rgba(237, 0, 192, 0.10) 68.85%, rgba(197, 0, 233, 0.10) 77.68%, rgba(112, 23, 255, 0.10) 89.32%)";
-
-    circle.style.left = isEnabled ? "20px" : "2px"; // Move the circle based on the toggle state
+      ? "radial-gradient(61.46% 59.09% at 36.25% 96.55%, #FFD600 0%, #FF6930 48.44%, #FE3B36 73.44%, rgba(254, 59, 54, 0.00) 100%)"
+      : "rgba(255, 255, 255, 0.2)";
+    
+    circle.style.left = isEnabled ? "20px" : "2px";
   }
 }
 
-// ✅ Function to remove toggle when leaving Reels
+// ✅ Remove Toggle
 function removeToggle() {
-  const toggleWrapper = document.querySelector("#myInjectedToggleWrapper");
-  if (toggleWrapper) toggleWrapper.remove(); // Remove the toggle button if it exists
+  const el = document.getElementById("myInjectedToggleWrapper");
+  if (el) el.remove();
 }
 
-// ✅ Start Auto-Scrolling
-function startAutoScrolling() {
-  console.log("Auto-scrolling enabled"); // Log the action
-  setInterval(() => {
-    if (!appIsRunning) return; // Exit if the app is not running
-    const currentVideo = getCurrentVideo(); // Get the current video
-    if (currentVideo) {
-      currentVideo.removeAttribute("loop"); // Remove loop attribute from the video
-      currentVideo.addEventListener("ended", onVideoEnd); // Add event listener for when the video ends
-    }
-  }, 100); // Check every 100 milliseconds
-}
-
-// ✅ Stop Auto-Scrolling
-function stopAutoScrolling() {
-  console.log("Auto-scrolling disabled"); // Log the action
-}
-
-// ✅ Handle video end event
-function onVideoEnd() {
-  if (!appIsRunning) return; // Exit if the app is not running
-  const nextVideo = getNextVideo(); // Get the next video
-  if (nextVideo) scrollToNextVideo(nextVideo); // Scroll to the next video if it exists
-}
-
-// ✅ Utility functions
-function getCurrentVideo() {
-  return [...document.querySelectorAll("main video")].find((video) => {
-    const rect = video.getBoundingClientRect();
-    return rect.top >= 0 && rect.bottom <= window.innerHeight; // Check if the video is in the viewport
-  });
-}
-
-function getNextVideo() {
-  const videos = document.querySelectorAll("main video");
-  const currentIndex = [...videos].findIndex(
-    (video) => video === getCurrentVideo() // Find the index of the current video
-  );
-  return videos[currentIndex + 1] || null; // Return the next video or null if it doesn't exist
-}
-
-function scrollToNextVideo(video) {
-  video.scrollIntoView({ behavior: "smooth", block: "center" }); // Scroll to the next video smoothly
-}
-
-// ✅ Listen for URL changes
-new MutationObserver(checkURLAndManageApp).observe(document.body, {
-  childList: true,
-  subtree: true,
-});
-window.addEventListener("popstate", checkURLAndManageApp); // Listen for popstate events
-checkURLAndManageApp(); // Initial check for URL
-
-// ✅ Listen for popup toggle events
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.event === "toggleAutoReels") {
-    toggleAutoScrolling(message.state); // Toggle auto-scrolling based on the message state
-  }
-  if (message.event === "toggleInjectButton") {
-    chrome.storage.sync.set({ injectReelsButton: message.state }, () => {
-      injectToggle(message.state); // Inject toggle button based on the message state
-    });
-  }
-});
+// Start
+init();

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "InstaReels Auto Scroller",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Auto-scroll Instagram Reels hands-free! Watch nonstop while eating, working, or multitasking—no taps needed! 🚀",
   "icons": {
     "128": "src/icons/icon128.png",
