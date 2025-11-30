@@ -1,14 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Reels Flow: Auto Scroll for Instagram Reels",
+  "short_name": "Reels Flow",
   "version": "2.0.0",
-  "description": "Auto-scroll Instagram Reels hands-free! Watch nonstop while eating, working, or multitasking—no taps needed! 🚀",
+  "description": "Watch Instagram Reels hands-free! The #1 Auto Scroller that automatically plays the next Reel. Includes a simple toggle button.",
   "icons": {
     "128": "src/assets/icons/icon128.png",
     "48": "src/assets/icons/icon48.png",
-    "38": "src/assets/icons/icon38.png",
-    "32": "src/assets/icons/icon32.png",
-    "19": "src/assets/icons/icon19.png",
     "16": "src/assets/icons/icon16.png"
   },
   "permissions": ["storage", "activeTab", "scripting", "tabs"],
