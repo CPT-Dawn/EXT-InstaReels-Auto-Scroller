@@ -5,6 +5,7 @@ let videoObserver = null;
 let pageObserver = null;
 
 // ✅ Initialize the extension
+// ✅ Initialize the extension
 function init() {
   chrome.storage.sync.get(["autoReelsStart", "injectReelsButton"], (data) => {
     autoScrollEnabled = data.autoReelsStart || false;
@@ -22,11 +23,15 @@ chrome.storage.onChanged.addListener((changes) => {
       setupVideoListener(currentVideo);
     }
   }
+  if (changes.injectReelsButton) {
+    showToggleEnabled = changes.injectReelsButton.newValue;
+    checkPage();
+  }
 });
 
 // ✅ Check if current page is Reels
 function isReelsPage() {
-  return window.location.href.startsWith("https://www.instagram.com/reels/");
+  return window.location.href.includes("/reels/");
 }
 
 // ✅ Main Logic to Start/Stop App based on URL
@@ -50,6 +55,11 @@ function setupObservers() {
 
   // MutationObserver to detect new videos loading (Infinite Scroll)
   pageObserver = new MutationObserver((mutations) => {
+    // Check if we are still on reels page and toggle is missing but should be there
+    if (isReelsPage() && showToggleEnabled && !document.getElementById("myInjectedToggleWrapper")) {
+        injectToggle(autoScrollEnabled);
+    }
+
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
         if (node.nodeType === 1) {
@@ -120,13 +130,25 @@ function cleanup() {
 
 // ✅ Listen for URL changes (SPA navigation)
 let lastUrl = location.href;
-new MutationObserver(() => {
+// Use a more robust URL change detection
+const urlObserver = new MutationObserver(() => {
   const url = location.href;
   if (url !== lastUrl) {
     lastUrl = url;
     checkPage();
   }
-}).observe(document, { subtree: true, childList: true });
+});
+urlObserver.observe(document, { subtree: true, childList: true });
+
+// Also listen to popstate just in case
+window.addEventListener("popstate", () => {
+    const url = location.href;
+    if (url !== lastUrl) {
+        lastUrl = url;
+        checkPage();
+    }
+});
+
 
 // ✅ Inject Styles
 function injectStyles() {

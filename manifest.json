@@ -12,7 +12,7 @@
   "permissions": ["storage", "activeTab", "scripting", "tabs"],
   "content_scripts": [
     {
-      "matches": ["https://www.instagram.com/reels/*"],
+      "matches": ["https://www.instagram.com/*"],
       "js": ["src/content/content.js"],
       "run_at": "document_end"
     }
