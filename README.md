@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="src/assets/images/header.png" alt="Reels Flow Logo" width="120" />
+  <img src="src/assets/images/Logo.png" alt="Reels Flow Logo" width="120" />
   <h1>Reels Flow</h1>
   <h3>Auto Scroll for Instagram Reels</h3>
   
@@ -91,5 +91,5 @@ This project is licensed under the [MIT License](LICENSE) - see the file for det
 ---
 
 <div align="center">
-  <p>Made with ❤️ by CPT Dawn</p>
+  <p>Made with ❤️ for Reels lovers</p>
 </div>
