@@ -24,4 +24,18 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     });
+
+    // ✅ Make entire card clickable
+    document.querySelectorAll(".setting-card").forEach(card => {
+        card.addEventListener("click", (e) => {
+            // Prevent double toggling if clicking the switch itself
+            if (e.target.closest(".toggle-switch")) return;
+
+            const checkbox = card.querySelector("input[type='checkbox']");
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event("change"));
+            }
+        });
+    });
 });
